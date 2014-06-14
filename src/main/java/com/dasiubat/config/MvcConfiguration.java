@@ -14,22 +14,22 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @Import({DBConfigurationDevelopment.class, DBConfigurationProduction.class})
-@ComponentScan(basePackages="com.dasiubat")
+@ComponentScan(basePackages = {"com.dasiubat.controller", "com.dasiubat.service"})
 @EnableWebMvc
-public class MvcConfiguration extends WebMvcConfigurerAdapter{
+public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
-	@Bean
-	public ViewResolver getViewResolver(){
-		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-		resolver.setPrefix("/WEB-INF/views/");
-		resolver.setSuffix(".jsp");
-		return resolver;
-	}
-	
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/src/main/resources/**").addResourceLocations("/src/main/resources/");
-	}
+    @Bean
+    public ViewResolver getViewResolver() {
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/views/");
+        resolver.setSuffix(".jsp");
+        return resolver;
+    }
 
-	
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/src/main/resources/**").addResourceLocations("/src/main/resources/");
+    }
+
+
 }
