@@ -2,9 +2,11 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
-import com.dasiubat.controller.GreetingController;
-import com.dasiubat.domain.Person;
-import com.dasiubat.repository.PersonRepository;
+import com.dasiubat.controller.MovieController;
+import com.dasiubat.domain.Movie;
+import com.dasiubat.service.MovieService;
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,14 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Created by Adam on 2014-06-09.
@@ -27,47 +28,83 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {MvcConfiguration.class, DBConfigurationTest.class})
+@Transactional
 public class MoviesAPITest {
     @Autowired
-    private WebApplicationContext wac;
+    private MovieController movieController;
 
-    private MockMvc mockMvc;
+    @Autowired
+    private MovieService movieService;
+    private Movie[] movies;
 
     @Before
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
-
-    @Autowired
-    private PersonRepository personRepository;
-
-    @Before
-    public void testData() {
-        Person person = new Person();
-        person.setName("adam");
-        person.setSurname("bat");
-
-        personRepository.save(person);
-
-        personRepository.findAll().forEach(System.out::println);
+        RestAssuredMockMvc.standaloneSetup(movieController);
+        movies = twoSampleMovies();
     }
 
     @Test
-    public void testTest() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk());
+    public void getMoviesShouldListAllMovies() {
+        Movie[] response = when().get("/movies")
+                .then().statusCode(200).contentType(ContentType.JSON)
+                .extract().as(Movie[].class);
+
+        assertArrayEquals(movies, response);
     }
 
     @Test
-    public void
-    greeting_resource_returns_an_id_and_expected_greeting_in_body() {
-        given()
-                .standaloneSetup(new GreetingController())
-                .param("name", "Johan").
-        when().
-                get("/greeting").
-        then().
-                statusCode(200).
-                body("id", equalTo(1)).
-                body("content", equalTo("Hello, Johan!"));
+    public void getMoviesIdShouldReturnMovie() {
+        Movie response = when().get("/movies/" + movies[0].getId())
+                .then().statusCode(200).contentType(ContentType.JSON)
+                .extract().as(Movie.class);
+
+        assertEquals(movies[0], response);
+    }
+
+    @Test
+    public void postMoviesShouldCreateNewMovie() {
+        Movie newMovie = new Movie();
+        newMovie.setTitle("Inception");
+        Long id = given().contentType(ContentType.JSON).body(newMovie)
+                .when().post("/movies/")
+                .then().statusCode(201).contentType(ContentType.JSON)
+                .extract().<Integer>path("id").longValue();
+
+        assertTrue(movieService.exists(id));
+        Movie savedMovie = movieService.findOne(id);
+        assertEquals(newMovie, savedMovie);
+    }
+
+    @Test
+    public void putMoviesIdShouldUpdateMovie() {
+        String newTitle = "The Dark Knight";
+        Movie update = new Movie();
+        update.setTitle(newTitle);
+
+        given().contentType(ContentType.JSON).body(update)
+                .when().put("/movies/" + movies[0].getId())
+                .then().statusCode(204);
+
+        assertEquals(newTitle, movies[0].getTitle());
+    }
+
+    @Test
+    public void deleteMoviesIdShouldDeleteMovie() {
+        when().delete("/movies/" + movies[0].getId())
+                .then().statusCode(204);
+
+        assertEquals(1, movieService.count());
+    }
+
+    private Movie[] twoSampleMovies() {
+        Movie batman = new Movie();
+        batman.setTitle("Batman");
+        movieService.save(batman);
+
+        Movie psy = new Movie();
+        psy.setTitle("Psy");
+        movieService.save(psy);
+
+        return new Movie[]{batman, psy};
     }
 }
