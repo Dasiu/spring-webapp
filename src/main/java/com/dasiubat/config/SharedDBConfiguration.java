@@ -22,7 +22,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories({"com.dasiubat.repository", "com.dasiubat.service"})
+@EnableJpaRepositories({"com.dasiubat.service"})
 @PropertySource({"classpath:persistence.properties"})
 public class SharedDBConfiguration {
     @Autowired

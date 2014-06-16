@@ -1,8 +1,8 @@
 package com.dasiubat.config.development;
 
+import com.dasiubat.domain.Movie;
+import com.dasiubat.service.MovieService;
 import com.github.javafaker.Faker;
-import com.dasiubat.repository.PersonRepository;
-import com.dasiubat.domain.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,26 +14,25 @@ import javax.annotation.PostConstruct;
 @Component
 public class Seed {
     @Autowired
-    private PersonRepository personRepository;
+    private MovieService movieService;
 
     private static final Faker faker = new Faker();
 
     @PostConstruct
     public void seed() {
-        createPersons(100);
+        createMovie(10);
     }
 
-    public void createPersons(Integer num) {
+    public void createMovie(Integer num) {
         for (int i = 0; i < num; i++) {
-            personRepository.save(generatePerson());
+            movieService.save(generateMovie());
         }
     }
 
-    private Person generatePerson() {
-        Person person = new Person();
-        person.setName(faker.firstName());
-        person.setSurname(faker.lastName());
+    private Movie generateMovie() {
+        Movie movie = new Movie();
+        movie.setTitle(faker.sentence(1));
 
-        return person;
+        return movie;
     }
 }
