@@ -1,16 +1,22 @@
 package com.dasiubat.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+//@Audited
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+
+//    @OneToMany(mappedBy = "movie")
+//    private Set<Director> directors = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -44,4 +50,12 @@ public class Movie {
     public void setTitle(String title) {
         this.title = title;
     }
+
+//    public Set<Director> getDirectors() {
+//        return directors;
+//    }
+//
+//    public void setDirectors(Set<Director> directors) {
+//        this.directors = directors;
+//    }
 }
