@@ -14,7 +14,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @Import({DBConfigurationDevelopment.class, DBConfigurationProduction.class})
-@ComponentScan(basePackages = {"com.dasiubat.controller"})
+@ComponentScan(basePackages = {"com.dasiubat.controller", "com.dasiubat.service", "com.dasiubat.repository"})
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
