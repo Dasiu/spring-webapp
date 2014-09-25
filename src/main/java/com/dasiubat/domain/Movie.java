@@ -8,15 +8,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-//@Audited
+@Audited
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+    private Integer year;
 
-//    @OneToMany(mappedBy = "movie")
-//    private Set<Director> directors = new HashSet<>();
+    @OneToMany(mappedBy = "movie")
+    private Set<Director> directors = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -51,11 +52,19 @@ public class Movie {
         this.title = title;
     }
 
-//    public Set<Director> getDirectors() {
-//        return directors;
-//    }
-//
-//    public void setDirectors(Set<Director> directors) {
-//        this.directors = directors;
-//    }
+    public Set<Director> getDirectors() {
+        return directors;
+    }
+
+    public void setDirectors(Set<Director> directors) {
+        this.directors = directors;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
 }

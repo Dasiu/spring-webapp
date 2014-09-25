@@ -2,8 +2,11 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
+import com.dasiubat.domain.ActionRevision;
+import com.dasiubat.domain.ActionTypeHolder;
 import com.dasiubat.domain.Director;
 import com.dasiubat.domain.Movie;
+import com.dasiubat.domain.enums.Action;
 import com.dasiubat.service.DirectorService;
 import com.dasiubat.service.MovieService;
 import org.hibernate.envers.AuditReader;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
@@ -47,8 +52,11 @@ public class TestsWithEnvers {
     @Autowired
     private DirectorService directorService;
 
-    private Movie batman = createMovie("Batman");
-    private Movie psy = createMovie("Psy");
+    @Autowired
+    private ActionTypeHolder actionTypeHolder;
+
+    private Movie batman = createMovie("Batman", 2010);
+    private Movie psy = createMovie("Psy", 2008);
 
     private Director nolan = createDirector("Nolan");
     private Director komasa = createDirector("Komasa");
@@ -62,21 +70,28 @@ public class TestsWithEnvers {
     @PostConstruct
     public void init() {
         transaction1();
-        transaction2();
+//        transaction2();
         transaction3();
-        transaction4();
-        transaction5();
+//        transaction4();
+//        transaction5();
     }
 
     @Test
     @Transactional
     public void enversTest() {
-        AuditReader reader = AuditReaderFactory.get(entityManager);
-        reader.createQuery().forEntitiesAtRevision(Movie.class, 1).addProjection()
-        AuditQuery auditQuery = reader.createQuery().forRevisionsOfEntity(Movie.class, false, true);
-        List<?> objects = auditQuery.getResultList();
+//        CriteriaQuery crtieriaQuery = entityManager.getCriteriaBuilder().createQuery(ActionRevision.class);
+        Query query = entityManager.createNativeQuery("SELECT * FROM envers.actionrevision WHERE action IN ('CALENDAR')",
+                ActionRevision.class);
 
-        assertNotEquals("success", objects.size(), 0);
+        List<ActionRevision> actionRevisions = query.getResultList();
+        AuditReader reader = AuditReaderFactory.get(entityManager);
+//        AuditQuery auditQuery = reader.createQuery().forRevisionsOfEntity(Movie.class, false, true);
+//        List<?> objects = auditQuery.getResultList();
+
+        Action action = Action.MESSAGE;
+        boolean flag = action.isConnectedWithCase();
+//        fail("sd");
+//        assertNotEquals("success", objects.size(), 0);
     }
 
     @Transactional
@@ -110,9 +125,11 @@ public class TestsWithEnvers {
         directorService.save(komasa);
     }
 
-    private Movie createMovie(String title) {
+    private Movie createMovie(String title, int year) {
         Movie movie = new Movie();
         movie.setTitle(title);
+        movie.setYear(year);
         return movie;
     }
 }
+

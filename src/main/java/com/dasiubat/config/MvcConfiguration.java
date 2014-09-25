@@ -2,10 +2,10 @@ package com.dasiubat.config;
 
 import com.dasiubat.config.development.DBConfigurationDevelopment;
 import com.dasiubat.config.production.DBConfigurationProduction;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import com.dasiubat.domain.ActionTypeHolder;
+import com.dasiubat.utils.ContextLookup;
+import org.springframework.context.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -32,4 +32,15 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
 
+    // TODO scan for beans in other packages
+    @Bean
+    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+    public ActionTypeHolder actionTypeHolder() {
+        return new ActionTypeHolder();
+    }
+
+    @Bean
+    public ContextLookup contextLookup() {
+        return new ContextLookup();
+    }
 }

@@ -13,10 +13,10 @@ public class Director {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "firstname")
     private String name;
 
     @ManyToOne
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private Movie movie;
 
     public Long getId() {

@@ -13,14 +13,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Adam on 2014-06-09.
@@ -28,7 +33,8 @@ import static org.junit.Assert.assertArrayEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {MvcConfiguration.class, DBConfigurationTest.class})
-@Transactional
+//@Transactional
+//@TransactionConfiguration(defaultRollback=false)
 public class MoviesAPITest {
     @Autowired
     private MovieController movieController;
@@ -96,14 +102,35 @@ public class MoviesAPITest {
         assertEquals(1, movieService.count());
     }
 
+    @Test
+    public void testRequest() {
+        when().delete("/movies/requestScope/" + 2)
+                .then().statusCode(204);
+
+//        ExecutorService executorService = Executors.newFixedThreadPool(4);
+//        executorService.submit(new Runnable() {
+//            @Override
+//            public void run() {
+                when().delete("/movies/requestScope/" + 1)
+                        .then().statusCode(204);
+//            }
+//        });
+
+        when().delete("/movies/requestScope/" + 3)
+                .then().statusCode(204);
+
+        System.out.println("sdf");
+//        fail("fsd");
+    }
+
     private Movie[] twoSampleMovies() {
         Movie batman = new Movie();
         batman.setTitle("Batman");
-        movieService.save(batman);
+//        movieService.save(batman);
 
         Movie psy = new Movie();
         psy.setTitle("Psy");
-        movieService.save(psy);
+//        movieService.save(psy);
 
         return new Movie[]{batman, psy};
     }

@@ -1,11 +1,13 @@
 package com.dasiubat.controller;
 
+import com.dasiubat.domain.ActionTypeHolder;
+import com.dasiubat.domain.Director;
 import com.dasiubat.domain.Movie;
+import com.dasiubat.domain.enums.Action;
 import com.dasiubat.service.MovieService;
+import com.dasiubat.utils.ContextLookup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,6 +21,9 @@ import java.util.Map;
 public class MovieController {
     @Autowired
     private MovieService movieService;
+
+//    @Autowired
+//    private ActionTypeHolder actionTypeHolder;
 
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<Movie> index() {
@@ -51,5 +56,47 @@ public class MovieController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Integer id) {
         movieService.delete(id.longValue());
+    }
+
+    @RequestMapping(value = "/requestScope/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void requestScope(@PathVariable Integer id) {
+        // TEST SECTION
+        Movie batman = createMovie("Batman", 2010);
+        Movie psy = createMovie("Psy", 2008);
+
+        Director nolan = createDirector("Nolan");
+        Director komasa = createDirector("Komasa");
+
+        ActionTypeHolder actionTypeHolder = ContextLookup.getBean(ActionTypeHolder.class);
+        System.out.println("request scope");
+        if (id == 1) {
+            actionTypeHolder.setAction(Action.CALENDAR);
+            System.out.println("stared waiting");
+            movieService.save(batman);
+//            try {
+//                Thread.sleep(10000);
+//            } catch (InterruptedException e) {
+//
+//            }
+        } else {
+            actionTypeHolder.setAction(Action.CASE);
+            movieService.save(psy);
+        }
+
+        System.out.println("request scope end");
+    }
+
+    private Movie createMovie(String title, int year) {
+        Movie movie = new Movie();
+        movie.setTitle(title);
+        movie.setYear(year);
+        return movie;
+    }
+
+    private Director createDirector(String name) {
+        Director director = new Director();
+        director.setName(name);
+        return director;
     }
 }
