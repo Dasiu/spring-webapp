@@ -11,6 +11,7 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+    private transient CustomObject customObject;
 
     @Override
     public boolean equals(Object o) {
@@ -43,5 +44,13 @@ public class Movie {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public CustomObject getCustomObject() {
+        return customObject;
+    }
+
+    public void setCustomObject(CustomObject customObject) {
+        this.customObject = customObject;
     }
 }

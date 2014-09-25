@@ -11,9 +11,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 
 import static org.junit.Assert.fail;
@@ -24,21 +26,39 @@ import static org.junit.Assert.fail;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {MvcConfiguration.class, DBConfigurationTest.class})
-@Transactional
+@TransactionConfiguration(defaultRollback = false)
 public class ActionRepositoryTest {
     @Autowired
     private ActionRepository actionRepository;
     private Action action;
 
-    @Before
-    public void setup() {
+    @PostConstruct
+    public void init() {
+        tran1();
+        tran2();
+    }
+
+    @Transactional
+    public void tran2() {
+//        Action original = actionRepository.findOriginalOne(1L);
+//        original.setCreationDate(new Date(1411642449079L));
+    }
+
+    @Transactional
+    public void tran1() {
         action = sampleAction();
     }
 
+    @Before
+    public void setup() {
+//        action = sampleAction();
+    }
+
     @Test
+    @Transactional
     public void findOriginalOne() {
-        action.setCreationDate(new Date());
         Action original = actionRepository.findOriginalOne(1L);
+//        action.setCreationDate(new Date(1411642449079L));
 
         fail("d");
     }

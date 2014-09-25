@@ -2,6 +2,7 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
+import com.dasiubat.domain.CustomObject;
 import com.dasiubat.domain.Movie;
 import com.dasiubat.service.ActionService;
 import com.dasiubat.service.MovieService;
@@ -11,8 +12,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 
 import static org.junit.Assert.fail;
 
@@ -23,6 +27,7 @@ import static org.junit.Assert.fail;
 @WebAppConfiguration
 @ContextConfiguration(classes = {MvcConfiguration.class, DBConfigurationTest.class})
 @Transactional
+@TransactionConfiguration(defaultRollback = false)
 public class ActionServiceTest {
     @Autowired
     private ActionService actionService;
@@ -32,14 +37,26 @@ public class ActionServiceTest {
     private Movie[] movies;
 //    private Action[] movies;
 
+    @PostConstruct
+    @Transactional
+    public void init() {
+        movies = twoSampleMovies();
+    }
+
     @Before
     public void setup() {
-        movies = twoSampleMovies();
+//        movies = twoSampleMovies();
     }
 
     @Test
     public void archiveShouldDetectAndStoreChanges() {
-        actionService.archive();
+        Movie batman = movies[0];
+        batman.setTitle("Revenge");
+        CustomObject customObject = new CustomObject();
+        customObject.setAtr("sdf");
+        customObject.setNum(1);
+        batman.setCustomObject(customObject);
+        actionService.audit(batman);
     }
 
     @Test

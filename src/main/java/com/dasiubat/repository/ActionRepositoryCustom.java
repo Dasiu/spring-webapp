@@ -9,8 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 
 public interface ActionRepositoryCustom {
-    /**
-     * loads entity from db in separate session
-     */
-    public Action findOriginalOne(Long id);
+    Action findOriginalOne(Long id);
 }

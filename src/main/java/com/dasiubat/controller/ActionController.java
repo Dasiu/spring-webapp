@@ -17,8 +17,8 @@ public class ActionController {
 //        return actionService.findAll();
 //    }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Action show(@PathVariable Integer id) {
-        return actionService.findOne(id.longValue());
-    }
+//    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+//    public Action show(@PathVariable Integer id) {
+//        return actionService.findOne(id.longValue());
+//    }
 }
