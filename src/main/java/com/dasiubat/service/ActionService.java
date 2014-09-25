@@ -1,8 +1,8 @@
 package com.dasiubat.service;
 
-import com.dasiubat.domain.Action;
+import com.dasiubat.domain.actions.Action;
+import com.dasiubat.repository.ActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,9 @@ public class ActionService {
     private ActionRepository actionRepository;
 
     public void archive() {
-        throw new UnsupportedOperationException();
+        // get tracked fields
+        // get original entity from db using new session
+        // compare
     }
 
     public Action findOne(Long id) {

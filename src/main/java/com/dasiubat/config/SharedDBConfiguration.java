@@ -1,5 +1,7 @@
 package com.dasiubat.config;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +24,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories({"com.dasiubat.service"})
+@EnableJpaRepositories({"com.dasiubat.service", "com.dasiubat.repository"})
 @PropertySource({"classpath:persistence.properties"})
 public class SharedDBConfiguration {
     @Autowired
@@ -33,9 +35,15 @@ public class SharedDBConfiguration {
         LocalContainerEntityManagerFactoryBean emfb = new LocalContainerEntityManagerFactoryBean();
         emfb.setDataSource(dataSource);
         emfb.setPackagesToScan("com.dasiubat.domain");
+//        emfb.setPersistenceProvider(hibernatePersistenceProvider());
         emfb.setJpaVendorAdapter(jpaVendorAdapter());
         return emfb;
     }
+
+//    @Bean
+//    public HibernatePersistenceProvider hibernatePersistenceProvider() {
+//        return new HibernatePersistenceProvider();
+//    }
 
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {

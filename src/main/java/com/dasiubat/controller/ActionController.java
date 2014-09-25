@@ -1,13 +1,8 @@
 package com.dasiubat.controller;
 
-import com.dasiubat.domain.Action;
-import com.dasiubat.domain.Movie;
+import com.dasiubat.domain.actions.Action;
 import com.dasiubat.service.ActionService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Adam on 2014-06-14.

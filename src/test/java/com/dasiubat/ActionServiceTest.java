@@ -2,12 +2,9 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
-import com.dasiubat.controller.ActionController;
 import com.dasiubat.domain.Movie;
-import com.dasiubat.service.ActionRepository;
 import com.dasiubat.service.ActionService;
 import com.dasiubat.service.MovieService;
-import com.jayway.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
