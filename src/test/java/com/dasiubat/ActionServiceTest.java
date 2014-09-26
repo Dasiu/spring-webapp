@@ -4,6 +4,8 @@ import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
 import com.dasiubat.domain.CustomObject;
 import com.dasiubat.domain.Movie;
+import com.dasiubat.domain.actions.Action;
+import com.dasiubat.domain.actions.MovieEditedAction;
 import com.dasiubat.service.ActionService;
 import com.dasiubat.service.MovieService;
 import org.junit.Before;
@@ -56,7 +58,9 @@ public class ActionServiceTest {
         customObject.setAtr("sdf");
         customObject.setNum(1);
         batman.setCustomObject(customObject);
-        actionService.audit(batman);
+
+        MovieEditedAction movieEditedAction = new MovieEditedAction();
+        actionService.audit(movieEditedAction, batman.getClass(), batman);
     }
 
     @Test
@@ -66,6 +70,11 @@ public class ActionServiceTest {
 
     @Test
     public void archiveShouldThrowFieldDoesntExist() {
+        fail("not implemented");
+    }
+
+    @Test
+    public void archiveShouldThrowIfTypeInferenceDoesntWork() {
         fail("not implemented");
     }
 

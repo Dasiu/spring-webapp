@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 
 public interface ActionRepositoryCustom {
     Action findOriginalOne(Long id);
+
+    <T> T findInSeparateSession(Class<T> type, Long id);
 }

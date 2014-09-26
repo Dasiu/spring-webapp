@@ -1,5 +1,6 @@
 package com.dasiubat.repository;
 
+import com.dasiubat.domain.Movie;
 import com.dasiubat.domain.actions.Action;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -24,6 +25,14 @@ public class ActionRepositoryImpl implements ActionRepositoryCustom {
     public Action findOriginalOne(Long id) {
         Session session = getSessionFactory().openSession(); // TODO check if it should be closed explicitly
         return (Action) session.get(Action.class, id);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T findInSeparateSession(Class<T> type, Long id) {
+        Session session = getSessionFactory().openSession(); // TODO check if it should be closed explicitly
+        return (T) session.get(type, id);
     }
 
     private SessionFactory getSessionFactory() {

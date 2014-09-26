@@ -2,9 +2,12 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
+import com.dasiubat.domain.BaseModel;
+import com.dasiubat.domain.Movie;
 import com.dasiubat.domain.actions.Action;
 import com.dasiubat.domain.actions.MovieEditedAction;
 import com.dasiubat.repository.ActionRepository;
+import com.dasiubat.service.MovieService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,10 +33,15 @@ import static org.junit.Assert.fail;
 public class ActionRepositoryTest {
     @Autowired
     private ActionRepository actionRepository;
-    private Action action;
+    private MovieEditedAction action;
+
+    @Autowired
+    private MovieService movieRepository;
+    private Movie[] movies;
 
     @PostConstruct
     public void init() {
+        movies = twoSampleMovies();
         tran1();
         tran2();
     }
@@ -57,16 +65,30 @@ public class ActionRepositoryTest {
     @Test
     @Transactional
     public void findOriginalOne() {
-        Action original = actionRepository.findOriginalOne(1L);
+        MovieEditedAction action = actionRepository.findInSeparateSession(MovieEditedAction.class, 1L);
+        Movie movie = action.getModel();
 //        action.setCreationDate(new Date(1411642449079L));
 
         fail("d");
     }
 
-    private Action sampleAction() {
-        Action a = new MovieEditedAction();
+    private MovieEditedAction sampleAction() {
+        MovieEditedAction a = new MovieEditedAction();
         a.setCreationDate(new Date());
+        a.setModel(movies[0]);
         actionRepository.save(a);
         return a;
+    }
+
+    private Movie[] twoSampleMovies() {
+        Movie batman = new Movie();
+        batman.setTitle("Batman");
+        movieRepository.save(batman);
+
+        Movie psy = new Movie();
+        psy.setTitle("Psy");
+        movieRepository.save(psy);
+
+        return new Movie[]{batman, psy};
     }
 }
