@@ -4,23 +4,28 @@ package com.dasiubat.domain;
  * Created by adam-bat-usr on 25/09/2014.
  */
 public class CustomObject {
-    private String atr;
-    private int num;
+    private String street;
+    private int number;
 
 
-    public int getNum() {
-        return num;
+    public int getNumber() {
+        return number;
     }
 
-    public void setNum(int num) {
-        this.num = num;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
-    public String getAtr() {
-        return atr;
+    public String getStreet() {
+        return street;
     }
 
-    public void setAtr(String atr) {
-        this.atr = atr;
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + "Ulica: " + street + " numer: " + number + "]";
     }
 }

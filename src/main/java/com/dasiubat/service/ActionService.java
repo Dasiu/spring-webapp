@@ -1,7 +1,9 @@
 package com.dasiubat.service;
 
-import com.dasiubat.domain.ActionToPropertiesException;
+import com.dasiubat.domain.ListModelPropertiesException;
 import com.dasiubat.domain.BaseModel;
+import com.dasiubat.domain.ModelCannotBeConvertedToString;
+import com.dasiubat.domain.ModelReference;
 import com.dasiubat.domain.actions.Action;
 import com.dasiubat.domain.actions.ActionNotRelatedToCase;
 import com.dasiubat.domain.actions.ActionRelatedToCase;
@@ -9,15 +11,16 @@ import com.dasiubat.domain.actions.AttributeHistoryEntry;
 import com.dasiubat.repository.ActionRepository;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.sun.istack.internal.NotNull;
 import org.apache.commons.beanutils.PropertyUtils;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,85 +34,84 @@ public class ActionService {
     @Autowired
     private ActionRepository actionRepository;
 
-    List<String> actionProperties = Arrays.asList("title");
-
-    // TODO t extends base model
-    public void audit(@NotNull ActionNotRelatedToCase action,
-                      @NotNull Class<? extends BaseModel> modelType,
-                      @NotNull BaseModel model) {
-        action.setModel(model);
-        audit(action, modelType);
+    public <T extends BaseModel> void audit(@NotNull ActionNotRelatedToCase<T> action,
+                                            @NotNull Class<? extends T> modelType,
+                                            @NotNull T model) {
+        auditHelper(action, modelType, model);
     }
 
     // TODO case obj
-    public void audit(@NotNull ActionRelatedToCase actionRelatedToCase,
-                      @NotNull Class<? extends BaseModel> modelType,
-                      @NotNull BaseModel model,
-                      @NotNull Object aCase) {
-        actionRelatedToCase.setModel(model);
+    public <T extends BaseModel> void audit(@NotNull ActionRelatedToCase<T> actionRelatedToCase,
+                                            @NotNull Class<? extends T> modelType,
+                                            @NotNull T model,
+                                            @NotNull Object aCase) {
         // TODO set case
-        audit(actionRelatedToCase, modelType);
+        auditHelper(actionRelatedToCase, modelType, model);
     }
 
-    private void audit(final Action action, Class<? extends BaseModel> type) {
-        BaseModel modifiedModel = action.getModel();
-        BaseModel originalModel = actionRepository.findInSeparateSession(type, 1L); // TODO check if original exists
-
-        List<String> modifiedProperties = modifiedProperties(originalModel, modifiedModel);
-
-        List<AttributeHistoryEntry> modificationHistoryForAction = modificationHistoryForAction(action,
-                modifiedProperties, originalModel, modifiedModel);
-
-        actionRepository.save(action);
-
-        for (AttributeHistoryEntry attributeHistoryEntry : modificationHistoryForAction) {
-            System.out.println("sf");
+    private <T extends BaseModel> void auditHelper(final Action<T> action, Class<? extends T> type, T modifiedModel) {
+        if (isModelNew(modifiedModel)) {
+            return;
         }
+
+        prepareAction(action, type, modifiedModel);
+        actionRepository.save(action);
+        saveHistory(modificationHistory(action, type, modifiedModel));
 
         System.out.println("sf");
         // save action
-        // save attributes
     }
 
-    private List<AttributeHistoryEntry> modificationHistoryForAction(
-            final Action action,
-            final List<String> modifiedProperties,
-            final BaseModel originalModel,
-            final BaseModel modifiedModel) {
-        final Map<String, String> originalPropertiesStringified = propertiesToString(modifiedProperties, originalModel);
-        final Map<String, String> modifiedPropertiesStringified = propertiesToString(modifiedProperties, modifiedModel);
-        return Lists.transform(modifiedProperties,
+    private void saveHistory(List<AttributeHistoryEntry> attributeHistoryEntries) {
+        for (AttributeHistoryEntry attributeHistoryEntry : attributeHistoryEntries) {
+            System.out.println(attributeHistoryEntry);
+            // save attributes
+        }
+    }
+
+    private <T extends BaseModel> void prepareAction(Action<T> action, Class<? extends T> type, T modifiedModel) {
+        setModelReference(action, type, modifiedModel);
+    }
+
+    private <T extends BaseModel> boolean isModelNew(T model) {
+        return model.getId() == null; // TODO in others case getid shouldnt be 0
+    }
+
+    private <T extends BaseModel> void setModelReference(Action<T> action, Class<? extends T> type, T modifiedModel) {
+        ModelReference modelReference = new ModelReference();
+        modelReference.setModelId(modifiedModel.getId().intValue());
+        modelReference.setModelType(type.getSimpleName());
+        action.setModelReference(modelReference);
+    }
+
+    private <T extends BaseModel> List<AttributeHistoryEntry> modificationHistory(
+            final Action<T> action, Class<? extends T> type, final T modifiedModel) {
+        final T originalModel = actionRepository.findInSeparateSession(type, 1L);
+        return Lists.transform(modifiedProperties(originalModel, modifiedModel),
                 new Function<String, AttributeHistoryEntry>() {
                     @Override
                     public AttributeHistoryEntry apply(String property) {
-                        System.out.println("ssdf");
+                        try {
+                            String oldValue = action.propertyToString(originalModel, property);
+                            String newValue = action.propertyToString(modifiedModel, property);
 
-                        String oldValue = action.propertyToString(originalModel, property);
-                        String newValue = action.propertyToString(modifiedModel, property);
-
-                        return createAttributeHistoryEntry(action, property, oldValue, newValue);
+                            return createAttributeHistoryEntry(action, property, oldValue, newValue);
+                        } catch (NullPointerException e) {
+                            throw new ModelCannotBeConvertedToString();
+                        }
                     }
                 });
     }
 
-    private AttributeHistoryEntry createAttributeHistoryEntry(Action action, String property, String oldValue,
-                                                              String newValue) {
+    private <T extends BaseModel> AttributeHistoryEntry createAttributeHistoryEntry(Action<T> action, String property,
+                                                                                    @NotNull String oldValue,
+                                                                                    @NotNull String newValue) {
         AttributeHistoryEntry attributeHistoryEntry = new AttributeHistoryEntry();
         attributeHistoryEntry.setAction(action);
         attributeHistoryEntry.setName(property);
         attributeHistoryEntry.setOldValue(oldValue);
         attributeHistoryEntry.setNewValue(newValue);
         return attributeHistoryEntry;
-    }
-
-    private Map<String, String> propertiesToString(List<String> properties, BaseModel model) {
-
-        // for each property
-        // call overridden method propertyToString
-        // switch (property)
-        // id => map put property, id
-        // creationDate => map put property, id
-        return null;
     }
 
     private List<String> modifiedProperties(BaseModel firstModel, BaseModel secondModel) {
@@ -123,7 +125,7 @@ public class ActionService {
                 }
             }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new ActionToPropertiesException(e);
+            throw new ListModelPropertiesException();
         }
 
         return modifiedProperties;

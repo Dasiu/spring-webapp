@@ -1,14 +1,11 @@
 package com.dasiubat.domain;
 
-import com.dasiubat.domain.enums.ActionType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
-import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@MappedSuperclass
 public abstract class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

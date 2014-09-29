@@ -2,9 +2,12 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
+import com.dasiubat.domain.BaseModel;
 import com.dasiubat.domain.CustomObject;
 import com.dasiubat.domain.Movie;
-import com.dasiubat.domain.actions.Action;
+import com.dasiubat.domain.actions.ActionNotRelatedToCase;
+import com.dasiubat.domain.actions.ActionRelatedToCase;
+import com.dasiubat.domain.actions.BrokenAction;
 import com.dasiubat.domain.actions.MovieEditedAction;
 import com.dasiubat.service.ActionService;
 import com.dasiubat.service.MovieService;
@@ -19,6 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.Entity;
 
 import static org.junit.Assert.fail;
 
@@ -37,7 +41,7 @@ public class ActionServiceTest {
     @Autowired
     private MovieService movieRepository;
     private Movie[] movies;
-//    private Action[] movies;
+    //    private Action[] movies;
 
     @PostConstruct
     @Transactional
@@ -51,35 +55,45 @@ public class ActionServiceTest {
     }
 
     @Test
-    public void archiveShouldDetectAndStoreChanges() {
+    public void auditShouldDetectAndStoreChanges() {
         Movie batman = movies[0];
         batman.setTitle("Revenge");
         CustomObject customObject = new CustomObject();
-        customObject.setAtr("sdf");
-        customObject.setNum(1);
+        customObject.setStreet("sdf");
+        customObject.setNumber(1);
         batman.setCustomObject(customObject);
 
-        MovieEditedAction movieEditedAction = new MovieEditedAction();
-        actionService.audit(movieEditedAction, batman.getClass(), batman);
+        actionService.audit(new MovieEditedAction(), batman.getClass(), batman);
     }
 
     @Test
-    public void archiveShouldDoNothingWhenEntityDoesntChange() {
-        fail("not implemented");
+    public void auditShouldDetectAndStoreChangesInCollections() {
+        Movie batman = movies[0];
+        batman.setTitle("Revenge");
+        CustomObject customObject = new CustomObject();
+        customObject.setStreet("sdf");
+        customObject.setNumber(1);
+        batman.setCustomObject(customObject);
+
+        actionService.audit(new MovieEditedAction(), batman.getClass(), batman);
     }
 
     @Test
-    public void archiveShouldThrowFieldDoesntExist() {
-        fail("not implemented");
+    public void auditShouldDoNothingWhenEntityDoesntChange() {
+        Movie batman = movies[0];
+
+        actionService.audit(new MovieEditedAction(), batman.getClass(), batman);
     }
 
     @Test
-    public void archiveShouldThrowIfTypeInferenceDoesntWork() {
-        fail("not implemented");
+    public void auditShouldThrowFieldDoesntExist() {
+        Movie batman = movies[0];
+        batman.setTitle("Revenge");
+        actionService.audit(new BrokenAction(), batman.getClass(), batman);
     }
 
     @Test
-    public void archiveArgsShouldBeNotNull() {
+    public void auditArgsShouldBeNotNull() {
         fail("not implemented");
     }
 
@@ -95,3 +109,5 @@ public class ActionServiceTest {
         return new Movie[]{batman, psy};
     }
 }
+
+

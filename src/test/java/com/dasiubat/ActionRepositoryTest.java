@@ -66,7 +66,7 @@ public class ActionRepositoryTest {
     @Transactional
     public void findOriginalOne() {
         MovieEditedAction action = actionRepository.findInSeparateSession(MovieEditedAction.class, 1L);
-        Movie movie = action.getModel();
+//        Movie movie = action.getModel();
 //        action.setCreationDate(new Date(1411642449079L));
 
         fail("d");
@@ -75,7 +75,7 @@ public class ActionRepositoryTest {
     private MovieEditedAction sampleAction() {
         MovieEditedAction a = new MovieEditedAction();
         a.setCreationDate(new Date());
-        a.setModel(movies[0]);
+//        a.setModel(movies[0]);
         actionRepository.save(a);
         return a;
     }

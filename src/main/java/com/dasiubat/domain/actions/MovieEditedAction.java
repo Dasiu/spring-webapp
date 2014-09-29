@@ -1,6 +1,6 @@
 package com.dasiubat.domain.actions;
 
-import com.dasiubat.domain.BaseModel;
+import com.dasiubat.domain.CustomObject;
 import com.dasiubat.domain.Movie;
 
 import javax.persistence.Entity;
@@ -15,8 +15,12 @@ public class MovieEditedAction extends ActionNotRelatedToCase<Movie> {
     @Override
     public String propertyToString(Movie movie, String property) {
         switch (property) {
-            case "title": movie.getTitle();
+            case "title":
+                return movie.getTitle();
+            case "customObject":
+                CustomObject customObject = movie.getCustomObject();
+                return (customObject != null) ? customObject.toString() : "";
+            default: throw new RuntimeException();
         }
-        return "";
     }
 }
