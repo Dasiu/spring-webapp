@@ -2,11 +2,8 @@ package com.dasiubat;
 
 import com.dasiubat.config.DBConfigurationTest;
 import com.dasiubat.config.MvcConfiguration;
-import com.dasiubat.domain.BaseModel;
-import com.dasiubat.domain.CustomObject;
+import com.dasiubat.domain.Address;
 import com.dasiubat.domain.Movie;
-import com.dasiubat.domain.actions.ActionNotRelatedToCase;
-import com.dasiubat.domain.actions.ActionRelatedToCase;
 import com.dasiubat.domain.actions.BrokenAction;
 import com.dasiubat.domain.actions.MovieEditedAction;
 import com.dasiubat.service.ActionService;
@@ -22,7 +19,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Entity;
 
 import static org.junit.Assert.fail;
 
@@ -58,10 +54,10 @@ public class ActionServiceTest {
     public void auditShouldDetectAndStoreChanges() {
         Movie batman = movies[0];
         batman.setTitle("Revenge");
-        CustomObject customObject = new CustomObject();
-        customObject.setStreet("sdf");
-        customObject.setNumber(1);
-        batman.setCustomObject(customObject);
+        Address address = new Address();
+        address.setStreet("sdf");
+        address.setNumber(1);
+        batman.setAddress(address);
 
         actionService.audit(new MovieEditedAction(), batman.getClass(), batman);
     }
@@ -70,10 +66,8 @@ public class ActionServiceTest {
     public void auditShouldDetectAndStoreChangesInCollections() {
         Movie batman = movies[0];
         batman.setTitle("Revenge");
-        CustomObject customObject = new CustomObject();
-        customObject.setStreet("sdf");
-        customObject.setNumber(1);
-        batman.setCustomObject(customObject);
+        batman.getRoles().add("Read");
+        batman.getRoles().add("Write");
 
         actionService.audit(new MovieEditedAction(), batman.getClass(), batman);
     }
@@ -100,6 +94,7 @@ public class ActionServiceTest {
     private Movie[] twoSampleMovies() {
         Movie batman = new Movie();
         batman.setTitle("Batman");
+        batman.getRoles().add("Delete");
         movieRepository.save(batman);
 
         Movie psy = new Movie();

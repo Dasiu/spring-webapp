@@ -1,14 +1,16 @@
 package com.dasiubat.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Movie extends BaseModel {
     private String title;
-    private transient CustomObject customObject;
+    private transient Address address;
+
+    @ElementCollection
+    private Set<String> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -35,11 +37,19 @@ public class Movie extends BaseModel {
         this.title = title;
     }
 
-    public CustomObject getCustomObject() {
-        return customObject;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setCustomObject(CustomObject customObject) {
-        this.customObject = customObject;
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }

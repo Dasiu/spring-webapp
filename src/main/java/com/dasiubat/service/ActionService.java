@@ -20,13 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Created by Adam on 2014-05-06.
- */
+import java.util.*;
 
 @Service
 @Transactional
@@ -41,12 +35,12 @@ public class ActionService {
     }
 
     // TODO case obj
-    public <T extends BaseModel> void audit(@NotNull ActionRelatedToCase<T> actionRelatedToCase,
+    public <T extends BaseModel> void audit(@NotNull ActionRelatedToCase<T> action,
                                             @NotNull Class<? extends T> modelType,
                                             @NotNull T model,
                                             @NotNull Object aCase) {
         // TODO set case
-        auditHelper(actionRelatedToCase, modelType, model);
+        auditHelper(action, modelType, model);
     }
 
     private <T extends BaseModel> void auditHelper(final Action<T> action, Class<? extends T> type, T modifiedModel) {
@@ -55,8 +49,8 @@ public class ActionService {
         }
 
         prepareAction(action, type, modifiedModel);
-        actionRepository.save(action);
         saveHistory(modificationHistory(action, type, modifiedModel));
+        actionRepository.save(action);
 
         System.out.println("sf");
         // save action
@@ -86,8 +80,8 @@ public class ActionService {
 
     private <T extends BaseModel> List<AttributeHistoryEntry> modificationHistory(
             final Action<T> action, Class<? extends T> type, final T modifiedModel) {
-        final T originalModel = actionRepository.findInSeparateSession(type, 1L);
-        return Lists.transform(modifiedProperties(originalModel, modifiedModel),
+        final T originalModel = actionRepository.findInSeparateSession(type, modifiedModel.getId());
+        return Lists.transform(modifiedProperties(action, originalModel, modifiedModel),
                 new Function<String, AttributeHistoryEntry>() {
                     @Override
                     public AttributeHistoryEntry apply(String property) {
@@ -114,12 +108,14 @@ public class ActionService {
         return attributeHistoryEntry;
     }
 
-    private List<String> modifiedProperties(BaseModel firstModel, BaseModel secondModel) {
+    private <T extends BaseModel> List<String> modifiedProperties(Action<T> action, BaseModel firstModel,
+                                                                  BaseModel secondModel) {
         List<String> modifiedProperties = new ArrayList<>();
         try {
             Map<String, Object> firstDecoupled = PropertyUtils.describe(firstModel);
             Map<String, Object> secondDecoupled = PropertyUtils.describe(secondModel);
-            for (String property : firstDecoupled.keySet()) {
+
+            for (String property : auditedProperties(action, firstDecoupled)) {
                 if (isModified(property, firstDecoupled, secondDecoupled)) {
                     modifiedProperties.add(property);
                 }
@@ -129,6 +125,12 @@ public class ActionService {
         }
 
         return modifiedProperties;
+    }
+
+    private <T extends BaseModel> Set<String> auditedProperties(Action<T> action, Map<String, Object> firstDecoupled) {
+        Set<String> auditedProperties = new HashSet<>(firstDecoupled.keySet());
+        auditedProperties.removeAll(action.getExcludedProperties());
+        return auditedProperties;
     }
 
     private boolean isModified(String property, Map<String, Object> first, Map<String, Object> second) {
