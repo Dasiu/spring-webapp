@@ -3,7 +3,7 @@ package com.webapp.domain;
 import javax.persistence.Entity;
 
 @Entity
-public class Movie extends WithArtificialId {
+public class Movie extends AuditableEntity {
     private String title;
 
     @Override
