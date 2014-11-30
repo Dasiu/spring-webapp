@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @MappedSuperclass
-public abstract class AuditableEntity extends BaseEntity {
+public abstract class AuditableEntity extends WithArtificialId {
     @CreatedBy
     @ManyToOne
     protected User createdBy;

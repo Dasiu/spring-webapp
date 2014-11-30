@@ -3,7 +3,7 @@ package com.webapp.domain;
 import javax.persistence.Entity;
 
 @Entity
-public class Movie extends BaseEntity {
+public class Movie extends WithArtificialId {
     private String title;
 
     @Override
@@ -13,9 +13,7 @@ public class Movie extends BaseEntity {
 
         Movie movie = (Movie) o;
 
-        if (title != null ? !title.equals(movie.title) : movie.title != null) return false;
-
-        return true;
+        return !(title != null ? !title.equals(movie.title) : movie.title != null);
     }
 
     @Override
