@@ -16,7 +16,7 @@ public class User extends BaseEntity {
     private String login;
 
     @NotNull
-    @Column(length = 50)
+    @Column(length = 60)
     private String password;
 
     @NotNull
