@@ -1,4 +1,4 @@
-package com.icupad.repository;
+package com.webapp.repository;
 
 import com.webapp.domain.User;
 import org.springframework.data.repository.NoRepositoryBean;

@@ -1,4 +1,4 @@
-package com.icupad.repository;
+package com.webapp.repository;
 
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
