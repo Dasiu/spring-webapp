@@ -1,38 +1,17 @@
 package com.webapp.service;
 
 import com.webapp.domain.Movie;
-import com.webapp.repository.MovieRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@Transactional
-public class MovieService {
-    @Autowired
-    private MovieRepository movieRepository;
+public interface MovieService {
+    boolean exists(Long id);
 
-    public boolean exists(Long id) {
-        return movieRepository.exists(id);
-    }
+    Movie findOne(Long id);
 
-    public Movie findOne(Long id) {
-        return movieRepository.findOne(id);
-    }
+    long count();
 
-    public long count() {
-        return movieRepository.count();
-    }
+    void save(Movie movie);
 
-    public void save(Movie movie) {
-        movieRepository.save(movie);
-    }
+    Iterable<Movie> findAll();
 
-    public Iterable<Movie> findAll() {
-        return movieRepository.findAll();
-    }
-
-    public void delete(Long id) {
-        movieRepository.delete(id);
-    }
+    void delete(Long id);
 }

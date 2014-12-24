@@ -1,50 +1,27 @@
 package com.webapp.controller;
 
 import com.webapp.domain.Movie;
-import com.webapp.service.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/movies")
-public class MovieController {
-    @Autowired
-    private MovieService movieService;
-
+public interface MovieController {
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<Movie> index() {
-        return movieService.findAll();
-    }
+    Iterable<Movie> index();
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Map<String, Long> create(@RequestBody Movie movie) {
-        movieService.save(movie);
-        Map<String, Long> response = new HashMap<>();
-        response.put("id", movie.getId());
-
-        return response;
-    }
+    Map<String, Long> create(@RequestBody Movie movie);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Movie show(@PathVariable Integer id) {
-        return movieService.findOne(id.longValue());
-    }
+    Movie show(@PathVariable Integer id);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void update(@PathVariable Integer id, @RequestBody Movie movie) {
-        movie.setId(id.longValue());
-        movieService.save(movie);
-    }
+    void update(@PathVariable Integer id, @RequestBody Movie movie);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void destroy(@PathVariable Integer id) {
-        movieService.delete(id.longValue());
-    }
+    void destroy(@PathVariable Integer id);
 }
