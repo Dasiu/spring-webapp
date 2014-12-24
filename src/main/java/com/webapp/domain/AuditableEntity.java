@@ -17,17 +17,49 @@ import java.time.LocalDateTime;
 public abstract class AuditableEntity extends WithArtificialId {
     @CreatedBy
     @ManyToOne
-    protected User createdBy;
+    private User createdBy;
 
     @CreatedDate
     @Column(columnDefinition = "timestamp")
-    protected LocalDateTime createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedBy
     @ManyToOne
-    protected User lastModifiedBy;
+    private User lastModifiedBy;
 
     @LastModifiedDate
     @Column(columnDefinition = "timestamp")
-    protected LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(User lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 }
