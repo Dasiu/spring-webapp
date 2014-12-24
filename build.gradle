@@ -5,7 +5,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 version = '1.0'
 mainClassName = "com.webapp.Application"
 
-def springBootVersion = '1.1.9.RELEASE'
+def springBootVersion = '1.2.0.RELEASE'
 
 repositories {
     mavenLocal()
