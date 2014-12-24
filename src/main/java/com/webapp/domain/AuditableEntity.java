@@ -1,5 +1,7 @@
 package com.webapp.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -21,6 +23,7 @@ public abstract class AuditableEntity extends WithArtificialId {
 
     @CreatedDate
     @Column(columnDefinition = "timestamp")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdDate;
 
     @LastModifiedBy
@@ -29,6 +32,7 @@ public abstract class AuditableEntity extends WithArtificialId {
 
     @LastModifiedDate
     @Column(columnDefinition = "timestamp")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime lastModifiedDate;
 
     public User getCreatedBy() {
