@@ -1,27 +1,26 @@
 package com.webapp.controller;
 
-import com.webapp.domain.Movie;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-public interface BaseController {
+public interface BaseController<T> {
     @RequestMapping(method = RequestMethod.GET)
-    Iterable<Movie> index();
+    Iterable<T> index();
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    Map<String, Long> create(@RequestBody Movie movie);
+    Map<String, Long> create(@RequestBody T t);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    Movie show(@PathVariable Integer id);
+    T show(@PathVariable Long id);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    void update(@PathVariable Integer id, @RequestBody Movie movie);
+    void update(@PathVariable Long id, @RequestBody T t);
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    void destroy(@PathVariable Integer id);
+    void destroy(@PathVariable Long id);
 }

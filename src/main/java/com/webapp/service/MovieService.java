@@ -1,5 +1,6 @@
 package com.webapp.service;
 
-public interface MovieService extends BaseService {
+import com.webapp.domain.Movie;
 
+public interface MovieService extends BaseService<Movie> {
 }

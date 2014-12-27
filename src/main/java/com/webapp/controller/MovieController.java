@@ -1,4 +1,6 @@
 package com.webapp.controller;
 
-public interface MovieController extends BaseController {
+import com.webapp.domain.Movie;
+
+public interface MovieController extends BaseController<Movie> {
 }

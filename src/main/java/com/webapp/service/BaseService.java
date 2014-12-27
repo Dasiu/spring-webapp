@@ -1,23 +1,19 @@
 package com.webapp.service;
 
-import com.webapp.domain.Movie;
-import org.springframework.transaction.annotation.Transactional;
+public interface BaseService<T> {
 
-@Transactional
-public interface BaseService {
-    @Transactional(readOnly = true)
     boolean exists(Long id);
 
-    @Transactional(readOnly = true)
-    Movie findOne(Long id);
 
-    @Transactional(readOnly = true)
+    T findOne(Long id);
+
+
     long count();
 
-    void save(Movie movie);
+    void save(T t);
 
-    @Transactional(readOnly = true)
-    Iterable<Movie> findAll();
+
+    Iterable<T> findAll();
 
     void delete(Long id);
 }
