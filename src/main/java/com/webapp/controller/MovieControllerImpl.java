@@ -32,18 +32,18 @@ public class MovieControllerImpl implements MovieController {
     }
 
     @Override
-    public Movie show(@PathVariable Integer id) {
-        return movieService.findOne(id.longValue());
+    public Movie show(@PathVariable Long id) {
+        return movieService.findOne(id);
     }
 
     @Override
-    public void update(@PathVariable Integer id, @RequestBody Movie movie) {
-        movie.setId(id.longValue());
+    public void update(@PathVariable Long id, @RequestBody Movie movie) {
+        movie.setId(id);
         movieService.save(movie);
     }
 
     @Override
-    public void destroy(@PathVariable Integer id) {
-        movieService.delete(id.longValue());
+    public void destroy(@PathVariable Long id) {
+        movieService.delete(id);
     }
 }
