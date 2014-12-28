@@ -1,50 +1,56 @@
 package com.webapp;
 
-import com.webapp.controller.MovieController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.authentication.FormAuthConfig;
+import com.jayway.restassured.config.ObjectMapperConfig;
+import com.jayway.restassured.config.RestAssuredConfig;
+import com.jayway.restassured.http.ContentType;
 import com.webapp.domain.Movie;
 import com.webapp.service.MovieService;
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static com.jayway.restassured.RestAssured.*;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertTrue;
 
 public class MoviesAPITest extends BaseIntegrationTest {
-    @Autowired
-    private MovieController movieController;
+    @Value("${local.server.port}")
+    int port;
 
     @Autowired
     private MovieService movieService;
+
     private Movie[] movies;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Before
     public void setup() {
-        RestAssuredMockMvc.standaloneSetup(movieController);
+        restAssuredConfig();
+        movieService.deleteAll();
         movies = twoSampleMovies();
     }
 
     @Test
     public void getMoviesShouldListAllMovies() {
-        Movie[] response = when().get("/movies")
-                .then().statusCode(200).contentType(ContentType.JSON)
-                .extract().as(Movie[].class);
-
-        assertArrayEquals(movies, response);
+        when().get("/movies").then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("title", hasItems("Batman", "Psy"));
     }
 
     @Test
     public void getMoviesIdShouldReturnMovie() {
         Movie response =
-                when().
-                        get("/movies/" + movies[0].getId())
-                .then()
-                        .statusCode(200).contentType(ContentType.JSON)
+                when().get("/movies/{0}", movies[0].getId()).then()
+                        .statusCode(200)
+                        .contentType(ContentType.JSON)
                         .extract().as(Movie.class);
 
         assertEquals(movies[0], response);
@@ -54,36 +60,46 @@ public class MoviesAPITest extends BaseIntegrationTest {
     public void postMoviesShouldCreateNewMovie() {
         Movie newMovie = new Movie();
         newMovie.setTitle("Inception");
-        Long id =
-                given().log().all().contentType(ContentType.JSON).body(newMovie)
-                .when().post("/movies/")
-                .then().log().all().statusCode(201).contentType(ContentType.JSON)
+
+        Long newMovieId = given()
+                .contentType(ContentType.JSON)
+                .body(newMovie)
+
+                .when().post("/movies").then()
+                .statusCode(201)
+                .contentType(ContentType.JSON)
                 .extract().<Integer>path("id").longValue();
 
-        assertTrue(movieService.exists(id));
-        Movie savedMovie = movieService.findOne(id);
-        assertEquals(newMovie, savedMovie);
+        assertTrue(movieService.exists(newMovieId));
     }
 
     @Test
     public void putMoviesIdShouldUpdateMovie() {
         String newTitle = "The Dark Knight";
-        Movie update = new Movie();
-        update.setTitle(newTitle);
+        Movie updatedMovie = new Movie();
+        updatedMovie.setTitle(newTitle);
 
-        given().contentType(ContentType.JSON).body(update)
-                .when().put("/movies/" + movies[0].getId())
-                .then().statusCode(204);
+        given()
+                .contentType(ContentType.JSON)
+                .body(updatedMovie)
 
-        assertEquals(newTitle, movies[0].getTitle());
+                .when().put("/movies/{0}", movies[0].getId()).then()
+                .statusCode(204);
     }
 
     @Test
     public void deleteMoviesIdShouldDeleteMovie() {
-        when().delete("/movies/" + movies[0].getId())
-                .then().statusCode(204);
+        when().delete("/movies/{0}", movies[0].getId()).then()
+                .statusCode(204);
+    }
 
-        assertEquals(1, movieService.count());
+    private void restAssuredConfig() {
+        RestAssured.port = port;
+        RestAssured.authentication = form("admin", "admin", new FormAuthConfig("/login", "username", "password"));
+        RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
+                new ObjectMapperConfig().jackson2ObjectMapperFactory(
+                        (cls, charset) -> objectMapper
+                ));
     }
 
     private Movie[] twoSampleMovies() {
