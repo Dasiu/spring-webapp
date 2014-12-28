@@ -1,5 +1,6 @@
 package com.webapp.service;
 
+import com.webapp.domain.User;
 import com.webapp.domain.UserDetailsUserAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserService userService;
 
     @Override
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return new UserDetailsUserAware(userService.findByLogin(login));
+        User user = userService.findByLogin(login);
+        if (user != null) {
+            return new UserDetailsUserAware(user);
+        } else {
+            throw new UsernameNotFoundException("User not found");
+        }
     }
 }
