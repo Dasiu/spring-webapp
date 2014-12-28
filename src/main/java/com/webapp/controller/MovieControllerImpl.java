@@ -33,7 +33,7 @@ public class MovieControllerImpl implements MovieController {
 
     @Override
     public Movie show(@PathVariable Long id) {
-        return movieService.findOne(id);
+        return movieService.getOne(id);
     }
 
     @Override
