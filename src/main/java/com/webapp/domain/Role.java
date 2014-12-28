@@ -6,7 +6,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Role extends WithArtificialId {
+public class Role extends AbstractWithArtificialId {
     @NotNull
     @Column(length = 50)
     private String name;

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AuditableEntity extends WithArtificialId {
+public abstract class AuditableEntity extends AbstractWithArtificialId {
     @CreatedBy
     @ManyToOne
     private User createdBy;

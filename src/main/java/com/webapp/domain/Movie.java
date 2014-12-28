@@ -7,6 +7,11 @@ public class Movie extends AuditableEntity {
     private String title;
 
     @Override
+    public int hashCode() {
+        return title != null ? title.hashCode() : 0;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Movie)) return false;
@@ -14,19 +19,6 @@ public class Movie extends AuditableEntity {
         Movie movie = (Movie) o;
 
         return !(title != null ? !title.equals(movie.title) : movie.title != null);
-    }
-
-    @Override
-    public int hashCode() {
-        return title != null ? title.hashCode() : 0;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
